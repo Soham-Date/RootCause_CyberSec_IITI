@@ -1,5 +1,4 @@
 # RootCause_CyberSec_IITI
-&nbsp
 
 ## LabMac
 
