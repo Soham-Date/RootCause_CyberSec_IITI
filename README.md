@@ -6,3 +6,4 @@ A VM was created on Microsoft Azure. The VM is named Ilion, another name for the
 
 _The VM runs on a Linux kernel, Ubuntu 24_04, gen V2, Arch x64, 4 Go RAM_
 
+We now have a place to safely run our exploits.
