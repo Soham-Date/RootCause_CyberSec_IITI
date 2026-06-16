@@ -29,3 +29,14 @@ When a process is forked, both the parent and child point to the same physical m
 4. The kernel then get's confused and writes to the original, untouched file.
 
 5. We can now use this to overwrite any files owned by root, even the passwd file
+
+
+# Environment Setup
+
+# Proof Of Concept Exploit
+
+# Impact Demonstration
+
+# Patch Analysis
+
+# Mitigation Review
