@@ -67,7 +67,7 @@ _During installation:
 Skip network configuration, no internet needed  
 Use Guided partitioning, use entire disk  
 Do not encrypt the home directory  
-Select only standard system utilities when prompted for software_
+Select only standard system utilities and SSH when prompted for software_
 
 **NOTE: DO NOT RUN _apt upgrade_  
 TO QUIT THE VM USE _sudo poweroff_**
