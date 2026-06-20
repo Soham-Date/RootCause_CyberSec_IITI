@@ -52,13 +52,13 @@ _virt-manager_
 
 ### Setting Up The Vulnerable VM
 
-A local virtual machine was created using virt-manager to replicate a vulnerable environment, since cloud providers such as Microsoft Azure no longer offer sufficiently old Ubuntu images on free/student tiers.
+A local virtual machine was created using virt-manager to replicate a vulnerable environment, since cloud providers such as Microsoft Azure no longer offer sufficiently old Ubuntu images on free/student tiers.Download the vulnerable ISO from the official Ubuntu releases archive: [Ubuntu 16.04.7 Server AMD64](https://releases.ubuntu.com/16.04/ubuntu-16.04.7-server-amd64.iso)
 
 In virt-manager:
 
 1. Click New VM
 2. Select Local install media (ISO)
-3. Install and browse to ubuntu-16.04.7-server-amd64.iso (the file is provided in the same git dir as this .md)
+3. Browse to _ubuntu-16.04.7-server-amd64.iso_ and select it
 4. Set RAM to 2048 Mo, CPUs to 2
 5. Set disk size to 20 Go
 6. Click Finish and proceed through the Ubuntu installer
