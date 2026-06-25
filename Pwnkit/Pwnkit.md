@@ -47,6 +47,10 @@ No user interaction is required once the exploit is executed.
 
 ---
 
+## Proof of concept exploit 
+"C:\Users\SAI VENKAT\OneDrive\Documents\WhatsApp Image 2026-06-26 at 12.24.24 AM.jpeg"
+
+
 ## Impact
 
 Successful exploitation allows an attacker to:
