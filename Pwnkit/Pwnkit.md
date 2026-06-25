@@ -1,3 +1,4 @@
+<img width="1600" height="1214" alt="WhatsApp Image 2026-06-26 at 12 24 24 AM" src="https://github.com/user-attachments/assets/e1a5a3d2-1b5c-46e7-b858-2d66d17a665a" />
 # PwnKit (CVE-2021-4034)
 
 ## Overview
@@ -48,8 +49,8 @@ No user interaction is required once the exploit is executed.
 ---
 
 ## Proof of concept exploit 
-"C:\Users\SAI VENKAT\OneDrive\Documents\WhatsApp Image 2026-06-26 at 12.24.24 AM.jpeg"
 
+<img width="1600" height="1214" alt="WhatsApp Image 2026-06-26 at 12 24 24 AM" src="https://github.com/user-attachments/assets/b82d3149-ac88-4b4c-87b6-a26d97c001b6" />
 
 ## Impact
 
