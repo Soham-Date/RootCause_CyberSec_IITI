@@ -29,3 +29,50 @@ For each selected vulnerability, the team will deliver the following:
 | CVE-2022-0847 | DirtyPipe | Pipe buffer flag misuse, file overwrite |
 | CVE-2026-31431 | Copy Fail | Kernel copy-on-write corruption |
 | CVE-2026-43284 | DirtyFrag | Memory fragmentation kernel exploit |
+
+### Linux Reconnaissance Utility
+
+A standalone script (Bash or Python) that audits a Linux system for common privilege-escalation indicators:
+- Kernel version matched against known vulnerable ranges  
+- SUID binaries present on the filesystem  
+- World-writable cron jobs or sensitive paths  
+- Dangerous sudo permission configurations  
+- Vulnerable installed package versions (e.g. polkit, sudo)  
+- Non-standard Linux capabilities assigned to binaries
+
+### Technical Reports
+
+Each CVE will be accompanied by a structured report covering: 
+- Vulnerability overview
+- Environment setup steps
+- Exploit walkthrough
+- Patch diff analysis
+- Recommended mitigations
+
+## Workflow (Tentative)
+
+| Step | Phase | Description |
+| :--- | :--- | :--- |
+| 1 | Research | Study CVE, NVD entry, published write-ups, and kernel source diff |
+| 2 | Environment | Spin up isolated VM/container with the vulnerable software version |
+| 3 | Exploit | Develop or adapt PoC; annotate every stage of the exploit chain |
+| 4 | Demonstrate | Record exploitation walkthrough showing privilege gained |
+| 5 | Patch | Locate the fixing commit; analyse what changed and why it works |
+| 6 | Document | Write structured technical report; generate demonstration video |
+
+## Tech Stack
+
+• Isolation: Docker, QEMU, Vagrant  
+• Exploit Development: C, Python  
+• Kernel Source Reference: Elixir Cross Referencer, GitHub Linux kernel mirror  
+• Reconnaissance Script: Bash / Python  
+• Reporting: Markdown, PDF, LATEX  
+• CVE Research: NVD, Mitre, vendor security advisories
+
+## Deliverables
+
+1. Working PoC exploits for a minimum of five Linux CVEs  
+2. Technical analysis reports for each vulnerability  
+3. Demonstration videos showing exploitation and patch walkthrough  
+4. Linux reconnaissance and privilege-escalation checking utility  
+5. GitHub repository with exploit code, environment setup instructions, and full documentation
