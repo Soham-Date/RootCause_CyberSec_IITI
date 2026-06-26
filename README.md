@@ -31,3 +31,7 @@ policies, or package updates available before the patch.
 | Identifier | Common Name | Vulnerability Type |
 | :--- | :--- | :--- |
 | CVE-2016-5195 | DirtyCOW | Race around in copy-on-write memory |
+| CVE-2021-4034 | PwnKit | Argument parsing flaw in pkexec |
+| CVE-2022-0847 | DirtyPipe | Pipe buffer flag misuse, file overwrite |
+| CVE-2026-31431 | Copy Fail | Kernel copy-on-write corruption |
+| CVE-2026-43284 | DirtyFrag | Memory fragmentation kernel exploit |
