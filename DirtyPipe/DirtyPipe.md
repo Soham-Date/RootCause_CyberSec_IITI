@@ -25,6 +25,16 @@ Each pipe buffer entry tracks this reference with a set of flags that describe w
 
 ## The Vulnerability
 
+CVE-2022-0847, known as DirtyPipe, is a flaw in the Linux kernel's pipe buffer flag handling, present from kernel version 5.8 until it was patched in 5.16.11 / 5.15.25 / 5.10.102.  
+The vulnerability works as follows:
+
+One of the pipe buffer flags, _PIPE_BUF_FLAG_CAN_MERGE_, signals to the kernel that incoming write data can be merged directly into an existing pipe buffer page, rather than allocating a new one.
+When a pipe buffer slot is recycled for reuse, the kernel fails to clear this flag. The old _CAN_MERGE_ flag from a previous operation remains set on the recycled buffer.
+An attacker uses _splice()_ to pull data from a read only file into the pipe. Because _splice()_ does not create a copy, the pipe buffer now references the actual page cache page of that file.
+The attacker then writes into the pipe. The kernel sees the _CAN_MERGE_ flag is set and, instead of allocating a fresh page, merges the write directly into the referenced page which is the read only file's page cache page.
+The write bypasses all permission checks entirely. The attacker has now modified the in memory contents of a file they have no write access to, and those changes are reflected immediately to any process reading the file.
+
+Since any readable file can be targeted including SUID binaries an unprivileged user can overwrite a root owned executable with malicious code and trigger its execution, achieving full privilege escalation.
 
 # Environment Setup
 
