@@ -14,18 +14,12 @@ RootCause addresses this gap by building a complete research and analysis enviro
 
 ### Core CVE Analysis Modules
 For each selected vulnerability, the team will deliver the following:
-• Root Cause Analysis : Identify and explain the exact code flaw: race condition,
-unchecked pointer, improper privilege validation, etc.
-• Isolated Environment Setup : Reproducible Docker or QEMU environment pinned
-to the vulnerable kernel or package version.
-• Proof-of-Concept Exploit : Working PoC with line-by-line commentary explaining
-each exploitation stage.
-• Impact Demonstration : Show privilege escalation or system compromise resulting
-from successful exploitation.
-• Patch Analysis : Identify the fixing commit, explain what changed, and discuss why
-it closes the vulnerability.
-• Mitigation Review : Document workarounds such as kernel hardening flags, SELinux
-policies, or package updates available before the patch.
+- Root Cause Analysis : Identify and explain the exact code flaw: race condition, unchecked pointer, improper privilege validation, etc.  
+- Isolated Environment Setup : Reproducible Docker or QEMU environment pinned to the vulnerable kernel or package version.  
+- Proof-of-Concept Exploit : Working PoC with line-by-line commentary explaining each exploitation stage.  
+- Impact Demonstration : Show privilege escalation or system compromise resulting from successful exploitation.  
+- Patch Analysis : Identify the fixing commit, explain what changed, and discuss why it closes the vulnerability.  
+- Mitigation Review : Document workarounds such as kernel hardening flags, SELinux policies, or package updates available before the patch.
 
 ### Target CVEs
 | Identifier | Common Name | Vulnerability Type |
