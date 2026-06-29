@@ -45,7 +45,7 @@ Select only standard system utilities and SSH when prompted for software_
 TO QUIT THE VM USE _sudo poweroff_**
 
 OS: Ubuntu 16.04.07 LTS  
-Kernel: 4.4 (unpatched)  
+Kernel: 4.4.0-31-generic (unpatched)  
 RAM: 2048 Mo  
 Disk: 20 Go (Virtual)  
 Network: None (isolated)
@@ -71,3 +71,12 @@ _gcc --version_
 
 Output:  
 _gcc (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609_
+
+## Non Root
+
+We need a non root user to run our exploits. To do this either use the Ubuntu GUI or use the CLI.
+
+CLI:  
+_sudo useradd -m -s /bin/bash -p $(openssl passwd -1 "yourpassword") username_
+
+replace _yourpassword_ with your password and _username_ with your username.
