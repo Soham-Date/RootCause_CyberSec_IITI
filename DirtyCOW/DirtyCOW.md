@@ -30,7 +30,22 @@ Since any file on the system can be targeted, an unprivileged user can overwrite
 
 # Proof Of Concept Exploit
 
+Let us try to write to a file called _important_file.txt_. The file is read only and is owned by owner, _owner_.  
+We are signed in as non root user _uwu_. 
+
+<img width="723" height="246" alt="image" src="https://github.com/user-attachments/assets/de691f93-28ec-4628-ba59-8b4159ee60c2" />
+
+As you can see, the file cannot be written to because it is read only. To write to it we will use the DirtyCOW exploit.
+
+We write out the code in a file called cow.c, compile it to an executable as cow, and run it on the file. As you can see, the _important.txt_ got changed even though we were not allowed to write to it.  
+Notice that only the first 8 characters were changed.  
+
+<img width="724" height="280" alt="image" src="https://github.com/user-attachments/assets/968acca9-67bf-4b19-90d8-7eafb1af9350" />
+
 # Impact Demonstration
+
+We can now use this to overwrite the /etc/passwd file. We can create a new user called toor, with root like permissions.
+
 
 # Patch Analysis
 
