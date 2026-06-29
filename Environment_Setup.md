@@ -80,3 +80,30 @@ CLI:
 _sudo useradd -m -s /bin/bash -p $(openssl passwd -1 "yourpassword") username_
 
 replace _yourpassword_ with your password and _username_ with your username.
+
+## SSH Login
+
+For the sake of convenience, I will be using my personal computer to SSH into the vulnerable VM as non root.
+
+To do this we first need ssh service on the VM:  
+_sudo apt install openssh-server_
+
+To start ssh server:  
+_sudo systemctl enable --now ssh_
+
+To stop ssh server:  
+_sudo systemctl disable --now ssh_
+
+Now, we need the host IP:  
+_hostname -I_  
+it looks something like 192.168.*.*
+
+The output is the IP address. For more information, use:  
+_ip addr_
+
+To ssh into your machine use:
+_ssh username@IP_
+
+replace username with the username on your vulnerable machine and IP with the IP address.  
+It will ask you for the password for the username.  
+If you ssh into a new mchine, you will get a warning about the authenticity of the host and will ask you to confirm, type 'yes'.
