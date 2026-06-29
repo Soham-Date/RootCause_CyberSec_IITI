@@ -24,6 +24,8 @@ _virt-manager_
 
 A local virtual machine was created using virt-manager to replicate a vulnerable environment, since cloud providers such as Microsoft Azure no longer offer sufficiently old Ubuntu images on free/student tiers.Download the vulnerable ISO from the official Ubuntu releases archive: [Ubuntu 16.04.1 Server](http://old-releases.ubuntu.com/releases/16.04.0/ubuntu-16.04.1-desktop-amd64.iso)
 
+_If nothing pops up on clicking the link, copy the link and paste in a new tab._
+
 In virt-manager:
 
 1. Click New VM
