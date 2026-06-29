@@ -22,7 +22,7 @@ _virt-manager_
 
 ### Setting Up The Vulnerable VM
 
-A local virtual machine was created using virt-manager to replicate a vulnerable environment, since cloud providers such as Microsoft Azure no longer offer sufficiently old Ubuntu images on free/student tiers.Download the vulnerable ISO from the official Ubuntu releases archive: [Ubuntu 16.04.1 Server](http://old-releases.ubuntu.com/releases/16.04.0/ubuntu-16.04.1-desktop-amd64.iso)
+A local virtual machine was created using virt-manager to replicate a vulnerable environment, since cloud providers such as Microsoft Azure no longer offer sufficiently old Ubuntu images on free/student tiers.Download the vulnerable ISO from the official Ubuntu releases archive: [Ubuntu 16.04.1 Desktop](http://old-releases.ubuntu.com/releases/16.04.0/ubuntu-16.04.1-desktop-amd64.iso)
 
 _If nothing pops up on clicking the link, copy the link and paste in a new tab._
 
@@ -30,7 +30,7 @@ In virt-manager:
 
 1. Click New VM
 2. Select Local install media (ISO)
-3. Browse to _ubuntu-16.04.7-server-amd64.iso_ and select it
+3. Browse to _ubuntu-16.04.1-desktop-amd64.iso_ and select it
 4. Set RAM to 2048 Mo, CPUs to 2
 5. Set disk size to 20 Go
 6. Click Finish and proceed through the Ubuntu installer
@@ -56,7 +56,7 @@ After booting into the kernel, verify:
 _uname -r_
 
 The output should be:  
-_4.4.0-xx-generic_
+_4.4.0-31-generic_
 
 This confirms the kernel is within the vulnerable range.  
 And again, **do not run _apt upgrade_ at any point as doing so would patch the kernel and eliminate the vulnerability.**
