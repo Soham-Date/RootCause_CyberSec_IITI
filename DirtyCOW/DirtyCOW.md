@@ -31,7 +31,7 @@ Since any file on the system can be targeted, an unprivileged user can overwrite
 # Proof Of Concept Exploit
 
 Let us try to write to a file called _important_file.txt_. The file is read only and is owned by owner, _owner_.  
-We are signed in as non root user _uwu_. 
+We are signed in as non root user _uwu_. We use the code in _dirtyc0w.c_ to overwrite this file.
 
 <img width="723" height="246" alt="image" src="https://github.com/user-attachments/assets/de691f93-28ec-4628-ba59-8b4159ee60c2" />
 
@@ -44,9 +44,19 @@ Notice that only the first 8 characters were changed.
 
 # Impact Demonstration
 
-We can now use this to overwrite the /etc/passwd file. We can create a new user called toor, with root like permissions.
-
+We can now use this to overwrite the /etc/passwd file. We can create a new user called toor, with root like permissions. We use the code from _dirtyuser.c_ to overwrite this file and create a new user called toor to get root permissions.  
+We touch a new c file called user.c and compile it.
 
 # Patch Analysis
 
 # Mitigation Review
+
+1. Updating the kernel to a patched version is the only foolproof solution.
+   
+2. Reduce the attackers opputunities. DirtyCOW requires local user accounts for escalation
+     - avoid unnecessary user accounts
+     - restrict shell access
+     - enforce least privileges
+     - monitor suspicious local processes
+       
+3. Monitoring sensitive files such as SUIDs and binaries
