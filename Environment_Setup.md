@@ -44,7 +44,7 @@ Select only standard system utilities and SSH when prompted for software_
 **NOTE: DO NOT RUN _apt upgrade_  
 TO QUIT THE VM USE _sudo poweroff_**
 
-OS: Ubuntu 16.04.07 LTS  
+OS: Ubuntu 16.04.1 LTS  
 Kernel: 4.4.0-31-generic (unpatched)  
 RAM: 2048 Mo  
 Disk: 20 Go (Virtual)  
