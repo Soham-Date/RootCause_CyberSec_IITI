@@ -53,6 +53,59 @@ We touch a new c file called user.c and compile it.
 
 # Patch Analysis
 
+[View the patch commit](https://git.zx2c4.com/wireguard-linux/commit/?h=devel&id=19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619&utm_source=chatgpt.com)
+
+Commit ID: 19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619  
+Commit title: mm: remove gup_flags FOLL_WRITE games from __get_user_pages()  
+Author: Linus Torvalds <torvalds@linux-foundation.org>  
+Date: 2016-10-13
+Affected subsystem: Memory Management (mm/)
+Files Modified: include/linux/mm.h ; mm/gup.c  
+
+## FOLL_COW
+
+In  
+_include/linux/mm.h_:  
+_#define FOLL_COW 0x4000_  
+was added.  
+The patch separates _FOLL_WRITE_ function to indicate completion of COW and assigns it to _FOLL_COW_. This removes the ambiguity of causing race.
+
+## Write validation function
+
+Added:  
+_static inline bool can_follow_write_pte(pte_t pte, unsigned int flags)
+{
+    return pte_write(pte) ||
+        ((flags & FOLL_FORCE) &&
+         (flags & FOLL_COW) &&
+         pte_dirty(pte));
+}_  
+
+This checks if the writing is actually valid.
+
+## Change in page write validation
+
+_if ((flags & FOLL_WRITE) && !pte_write(pte))_  
+was changed to  
+_if ((flags & FOLL_WRITE) &&
+    !can_follow_write_pte(pte, flags))_  
+
+ Thus, the kernel no longer trusts only the FOLL_WRITE flag and also verifies the actual page state.
+
+ ## COW state tracking
+
+ Removed _FOLL_WRITE_ after COW
+
+ Changed:  
+ _if ((ret & VM_FAULT_WRITE) &&  
+    !(vma->vm_flags & VM_WRITE))  
+      \*flags &= ~FOLL_WRITE;_
+
+To:  
+_if ((ret & VM_FAULT_WRITE) &&  
+    !(vma->vm_flags & VM_WRITE))  
+      \*flags |= FOLL_COW;_
+        
 # Mitigation Review
 
 1. Updating the kernel to a patched version is the only foolproof solution.
