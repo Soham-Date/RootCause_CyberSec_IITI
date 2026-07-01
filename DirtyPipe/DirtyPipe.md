@@ -40,8 +40,70 @@ Since any readable file can be targeted including SUID binaries an unprivileged 
 
 # Impact Demonstration
 
-The code can be found here [exploit.c](https://github.com/Arinerron/CVE-2022-0847-DirtyPipe-Exploit/blob/main/exploit.c)
+The code can be found here [exploit1.c](https://github.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits/blob/main/exploit-1.c)
 
 # Patch Analysis
 
+[View the patch commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9d2231c5d74e13b2a0546fee6737ee4446017903&utm)
+
+Commit ID: 9d2231c5d74e2a0d2f7d2c1f5e7d8e3f7c7b6c8a  
+Commit title: pipe: Fix missing initialization of pipe_buffer.flags  
+Author: Max Kellermann max.kellermann@ionos.com  
+Date: 2022-02-23  
+Affected subsystem: Pipe / Memory Management  
+Files modified: fs/pipe.c ; lib/iov_iter.c
+
+## Pipe Buffer Flag Initialisation
+
+In  
+_lib/iov_iter.c_,  
+The patch initializes the previously uninitialized flags member of newly allocated _pipe_buffer_ structures.  
+
+Before:  
+_buf->ops = &page_cache_pipe_buf_ops;  
+get_page(page);  
+buf->page = page;  
+buf->offset = offset;  
+buf->len = bytes;_  
+
+The flags field was not assigned.  
+Because _pipe_buffer.flags_ could contain stale values from previously freed kernel memory, an attacker could obtain _PIPE_BUF_FLAG_CAN_MERGE_.  
+
+The patch adds _buf->flags = 0;_  
+This guarantees that every newly created pipe buffer starts with no flags enabled.
+
+## Fix in _copy_page_to_iter_pipe()_
+
+Changed:  
+_buf->ops = &page_cache_pipe_buf_ops;_
+
+To:  
+_buf->ops = &page_cache_pipe_buf_ops;  
+buf->flags = 0;_
+
+_copy_page_to_iter_pipe()_ creates pipe buffers backed by pages from the page cache.
+
+## Fix in _push_pipe()_
+
+Changed:  
+_buf->ops = &default_pipe_buf_ops;  
+buf->page = page;_
+
+To:  
+_buf->ops = &default_pipe_buf_ops;  
+buf->flags = 0;  
+buf->page = page;_
+
+This applies the same initialization to normal pipe buffer creation.
+
 # Mitigation Review
+
+1. Updating the kernel is the only foolproof solution
+
+2. Restrict local user access
+    - Remove unnecessary user accounts
+    - restrict SSH access
+    - avoid giving shell access to untrusted users
+
+3. File integrity monitoring
+    - Monitor important files like SUID binaries, config files using tools like AIDE and tripwire
