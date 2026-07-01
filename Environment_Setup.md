@@ -22,7 +22,7 @@ _virt-manager_
 
 ### Setting Up The Vulnerable VM
 
-A local virtual machine was created using virt-manager to replicate a vulnerable environment, since cloud providers such as Microsoft Azure no longer offer sufficiently old Ubuntu images on free/student tiers.Download the vulnerable ISO from the official Ubuntu releases archive: [Ubuntu 16.04.1 Desktop](http://old-releases.ubuntu.com/releases/16.04.0/ubuntu-16.04.1-desktop-amd64.iso)
+A local virtual machine was created using virt-manager to replicate a vulnerable environment, since cloud providers such as Microsoft Azure no longer offer sufficiently old Ubuntu images on free/student tiers.Download the vulnerable ISO from the official Ubuntu releases archive: [Ubuntu 12.04.4 server (AMD64/EM64T)](https://old-releases.ubuntu.com/releases/12.04/ubuntu-12.04.4-server-amd64.iso), [Ubuntu 12.04.4 server (Intel x64)](https://old-releases.ubuntu.com/releases/12.04/ubuntu-12.04.4-server-i386.iso), [Ubuntu 20.04.1](https://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/)
 
 _If nothing pops up on clicking the link, copy the link and paste in a new tab._
 
@@ -44,8 +44,8 @@ Select only standard system utilities and SSH when prompted for software_
 **NOTE: DO NOT RUN _apt upgrade_  
 TO QUIT THE VM USE _sudo poweroff_**
 
-OS: Ubuntu 16.04.1 LTS  
-Kernel: 4.4.0-31-generic (unpatched)  
+OS: Ubuntu 12.04.4 LTS  
+Kernel: 3.11.0-15-generic (unpatched)  
 RAM: 2048 Mo  
 Disk: 20 Go (Virtual)  
 Network: None (isolated)
@@ -56,15 +56,27 @@ After booting into the kernel, verify:
 _uname -r_
 
 The output should be:  
-_4.4.0-31-generic_
+_3.11.0-15-generic_
 
 This confirms the kernel is within the vulnerable range.  
-And again, **do not run _apt upgrade_ at any point as doing so would patch the kernel and eliminate the vulnerability.**
+And again, **do not run _apt-get upgrade_ at any point as doing so would patch the kernel and eliminate the vulnerability. Update refreshes the package lists but upgrades will probably patch the kernel**
 
 ### Installing Build Tools
 
-Only _gcc_ is required in the VM to compile the exploit:  
-_sudo apt install gcc -y_
+Only _gcc_ is required in the VM to compile the exploit, but Ubuntu 12.04.4 LTS is EOL, so the normal Ubuntu mirrors no longer carry packages. You need to point apt to old-releases.ubuntu.com
+
+Edit your sources:  
+_sudo nano /etc/apt/sources.list_  
+clear out all the text and replace it with:  
+_deb http://old-releases.ubuntu.com/ubuntu/ precise main restricted universe multiverse  
+deb http://old-releases.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse  
+deb http://old-releases.ubuntu.com/ubuntu/ precise-security main restricted universe multiverse_
+
+Then:  
+_sudo apt-get clean  
+sudo apt-get update_
+
+_sudo apt-get install gcc -y_
 
 Verify:  
 _gcc --version_
