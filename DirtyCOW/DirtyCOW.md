@@ -58,8 +58,8 @@ We touch a new c file called user.c and compile it.
 Commit ID: 19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619  
 Commit title: mm: remove gup_flags FOLL_WRITE games from __get_user_pages()  
 Author: Linus Torvalds <torvalds@linux-foundation.org>  
-Date: 2016-10-13
-Affected subsystem: Memory Management (mm/)
+Date: 2016-10-13  
+Affected subsystem: Memory Management (mm/)  
 Files Modified: include/linux/mm.h ; mm/gup.c  
 
 ## FOLL_COW
