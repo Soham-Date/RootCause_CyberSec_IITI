@@ -36,11 +36,17 @@ The write bypasses all permission checks entirely. The attacker has now modified
 
 Since any readable file can be targeted including SUID binaries an unprivileged user can overwrite a root owned executable with malicious code and trigger its execution, achieving full privilege escalation.
 
-# Proof Of Concept Exploit
+# Proof Of Concept Exploit and Impact Demonstration
 
-# Impact Demonstration
+The code can be found here [exploit1.c](https://github.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits/blob/main/exploit-1.c)  
+The exploit code has already been configured to replace the root password with the password "piped" and will take a backup of the /etc/passwd file under /tmp/passwd.bak. Furthermore, the exploit will also provide you with an elevated root shell and will restore the original passwd file when done.
 
-The code can be found here [exploit1.c](https://github.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits/blob/main/exploit-1.c)
+Wr are logged into a vulnerable device called _Ilion_ as a non root user _uwu_. Let's say we want root access. We try to access the /etc/passwd file.  
+<img width="904" height="687" alt="image" src="https://github.com/user-attachments/assets/e0cfaac6-7e4e-4fff-b9d6-dbd61bdfc72a" />
+
+As we can see, we are denied access. Let us try to run the script and get root access.
+
+
 
 # Patch Analysis
 
