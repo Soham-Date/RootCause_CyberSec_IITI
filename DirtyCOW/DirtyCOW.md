@@ -53,7 +53,7 @@ We touch a new c file called user.c and compile it.
 
 # Patch Analysis
 
-[View the patch commit](https://git.zx2c4.com/wireguard-linux/commit/?h=devel&id=19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619&utm_source=chatgpt.com)
+[View the patch commit](https://git.zx2c4.com/wireguard-linux/commit/?h=devel&id=19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619&utm)
 
 Commit ID: 19be0eaffa3ac7d8eb6784ad9bdbc7d67ed8e619  
 Commit title: mm: remove gup_flags FOLL_WRITE games from __get_user_pages()  
