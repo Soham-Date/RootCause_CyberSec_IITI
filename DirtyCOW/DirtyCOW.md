@@ -30,6 +30,8 @@ Since any file on the system can be targeted, an unprivileged user can overwrite
 
 # Proof Of Concept Exploit
 
+The code can be accessed from [dirtyc0w.c](https://github.com/caldonovan/Dirty-COW-Exploit/blob/master/dirtyc0w.c) 
+
 Let us try to write to a file called _important_file.txt_. The file is read only and is owned by owner, _owner_.  
 We are signed in as non root user _uwu_. We use the code in _dirtyc0w.c_ to overwrite this file.
 
@@ -43,6 +45,8 @@ Notice that only the first 8 characters were changed.
 <img width="724" height="280" alt="image" src="https://github.com/user-attachments/assets/968acca9-67bf-4b19-90d8-7eafb1af9350" />
 
 # Impact Demonstration
+
+The code can be accessed from [dirtyuser.c](https://github.com/firefart/dirtycow)
 
 We can now use this to overwrite the /etc/passwd file. We can create a new user called toor, with root like permissions. We use the code from _dirtyuser.c_ to overwrite this file and create a new user called toor to get root permissions.  
 We touch a new c file called user.c and compile it.
