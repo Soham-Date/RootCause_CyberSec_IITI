@@ -146,6 +146,23 @@ gcc -o copy_fail_poc copy_fail_poc.c -pthread -g
 
 ## Proof of Concept (PoC) Evidence
 
+
+
+
+
+
+<img width="1600" height="233" alt="WhatsApp Image 2026-08-02 at 5 25 29 PM" src="https://github.com/user-attachments/assets/c7fbb6c7-812a-45ea-9bfe-40d1e65314aa" />
+
+
+
+
+
+<img width="723" height="362" alt="merged" src="https://github.com/user-attachments/assets/9c4915c5-57c4-4204-b137-6eaa4008fd9a" />
+
+
+
+
+
 ### Visual Evidence
 
 - **Screenshot/GIF:** Before and after file state
