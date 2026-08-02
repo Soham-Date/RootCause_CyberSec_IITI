@@ -154,32 +154,17 @@ cat /proc/sys/vm/dirty_background_ratio
 
 ```bash
 # Basic build
-gcc -o dirty_frag_poc dirty_frag_poc.c -pthread
-
-# With debug symbols (recommended for analysis)
-gcc -o dirty_frag_poc dirty_frag_poc.c -pthread -g -O0
-
-# Link against libpthread explicitly if needed
-gcc -o dirty_frag_poc dirty_frag_poc.c -lpthread
+gcc -Wall -o frag frag.c -lutil
 ```
 
 ### Running the Exploit
 
 ```bash
 # Basic execution
-./dirty_frag_poc
+./frag
 
-# With verbose output
-./dirty_frag_poc -v
-
-# Specify target file
-./dirty_frag_poc -f /tmp/target_file.txt
-
-# Run with specific thread count
-./dirty_frag_poc -t 4
-
-# Capture kernel logs alongside exploit output
-./dirty_frag_poc -v 2>&1 | tee exploit_output.log
+# With verbose outputm
+./frag -v
 ```
 
 ### Expected Behaviour (Vulnerable System)
@@ -200,7 +185,14 @@ gcc -o dirty_frag_poc dirty_frag_poc.c -lpthread
 
 ## Proof of Concept (PoC) Evidence
 
+We start off as a non privileged user. We try to use `sudo poweroff` to turn the machine off but this does not work as we do not have `sudo` privileges.  
+<img width="1149" height="795" alt="image" src="https://github.com/user-attachments/assets/d7efea9f-4d2f-4cea-b24f-7e420f906da9" />
 
+We then, create and compile the exploit executable.  
+<img width="1161" height="806" alt="image" src="https://github.com/user-attachments/assets/06719980-d7f0-4612-b65a-2b7dd43869e6" />
+
+And then simply run the exploit.  
+<img width="640" height="441" alt="frag" src="https://github.com/user-attachments/assets/ca42de20-a67a-474e-a846-fbe6792c38c3" />
 
 ---
 
@@ -369,6 +361,7 @@ Dirty Frag is most closely related to Dirty COW: both exploit a race window in p
 
 ## References
 
+- [dirtyfrag - V4bel](https://github.com/V4bel/dirtyfrag/tree/master)
 - [NVD CVE Entry — CVE-2026-43284](https://nvd.nist.gov/vuln/detail/CVE-2026-43284)
 - [Linux kernel `mm/page-writeback.c` source](https://elixir.bootlin.com/linux/latest/source/mm/page-writeback.c)
 - [LWN.net: Page cache writeback internals](https://lwn.net/Articles/602175/)
