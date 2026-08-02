@@ -187,6 +187,3 @@ Monitor SUID binaries and critical configuration files for unauthorized modifica
 - [Linux kernel pipe source — fs/pipe.c](https://elixir.bootlin.com/linux/latest/source/fs/pipe.c)
 
 ---
-
-*Last Updated: 2026-08-03*  
-*Status: Complete*
