@@ -82,14 +82,14 @@ An unprivileged attacker can exploit Copy Fail by:
 
 ### Kernel Versions
 
-- **Vulnerable:** Kernel versions [X.XX - Y.YY]
-- **Patched:** Kernel version [Z.ZZ] and later
+- **Vulnerable:** Kernel versions [4.14 - 6.19.11]
+- **Patched:** Kernel version [6.19.12] and later
 - **Status:** Backports available for LTS branches
 
 ### Test Environment
 
 **Setup used for reproduction:**
-- **Hypervisor:** QEMU/KVM (or Azure VM Ubuntu 22.04 LTS)
+- **Hypervisor:** QEMU/KVM 
 - **OS:** Ubuntu [version]
 - **Kernel:** [version with vulnerability]
 - **Architecture:** x86_64
