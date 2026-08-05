@@ -1,148 +1,91 @@
 # CVE-2026-31431: Copy Fail
 
-## Vulnerability Overview
+# Vulnerability Overview
 
-**CVE ID:** CVE-2026-31431  
-**Common Name:** Copy Fail  
-**CVSS Score:**   
-**Severity:** High  
-**Affected Component:** Linux kernel page copy mechanisms  
-**CWE:** CWE-362 (Concurrent Execution using Shared Resource with Improper Synchronization)  
+CVE-2026-31431 is a local privilege escalation vulnerability in the Linux kernel's **AF_ALG (Crypto API)** subsystem. The vulnerability results from improper handling of scatter-gather (`scatterlist`) structures during cryptographic operations. Under specific conditions, an unprivileged local user can manipulate kernel memory mappings, allowing file-backed page cache pages to become writable. This enables modification of privileged executables through the page cache without directly writing to the filesystem, ultimately leading to privilege escalation.
 
 ---
 
-## Background: Copy Operations in the Linux Kernel
+# Vulnerability Details
 
-To understand Copy Fail, we must first understand how the Linux kernel handles copy operations, particularly in the context of page copying and memory management.
+The vulnerability exists in the interaction between the AF_ALG socket interface, the Linux Crypto API, scatter-gather (`scatterlist`) structures, and the page cache.
 
-### Copy-on-Write (CoW) Basics
+AF_ALG accepts user-provided source (`req->src`) and destination (`req->dst`) buffers for cryptographic operations. Due to incorrect handling of destination scatterlists, the kernel may reference page cache pages directly without enforcing normal write protections.
 
-Copy-on-Write is an optimization technique used by the kernel to defer expensive memory copies. When a process creates a child (via `fork()`), instead of immediately duplicating all pages:
-
-1. Parent and child initially share the same physical pages
-2. Pages are marked read-only
-3. On first write, a page fault occurs
-4. The kernel allocates a new page and copies the original
-5. The writing process now has its own independent copy
-
-### Kernel Page Copy Functions
-
-The kernel provides several mechanisms for copying data between pages:
-
-- `copy_page()` - architecture-specific page copy
-- `memcpy()` - generic memory copying
-- `copy_user_generic()` - copies between kernel and user space
-- Page cache operations during file I/O
-
-### Synchronization Challenges
-
-These copy operations must be carefully synchronized when:
-- Multiple CPUs access the same memory
-- Pages transition between different states (CoW, shared, private)
-- Concurrent system calls operate on overlapping regions
+When the cryptographic request is processed, the kernel writes the output directly into these page cache pages. Since executable files are later loaded from the page cache, the modified contents are used during execution even though the underlying file remains protected by filesystem permissions.
 
 ---
 
-## Vulnerability Details
+# Root Cause
 
-### What is Copy Fail?
+The root cause is improper validation and handling of destination scatterlist buffers inside the Linux Crypto API.
 
-Copy Fail is a race condition vulnerability in [specific kernel subsystem - e.g., the page copy mechanism / copy-on-write logic]. The vulnerability occurs when:
+During AF_ALG request processing:
 
-1. A process initiates a copy operation on a page
-2. Another process (or kernel thread) concurrently modifies the page's metadata or state
-3. The copy completes with stale or inconsistent data
-4. Data corruption or privilege escalation becomes possible
+- User-controlled memory is converted into scatterlist entries.
+- The kernel constructs source (`req->src`) and destination (`req->dst`) scatterlists.
+- Scatterlist chaining (`sg_chain()`) may cause page cache pages to be referenced as writable destination buffers.
+- The crypto subsystem performs write operations directly into these pages.
+- The kernel fails to prevent writes to read-only, file-backed page cache pages.
 
-### Root Cause
-
-The vulnerability stems from insufficient synchronization between:
-- The copy operation itself
-- Page state transitions (e.g., marking a page as CoW)
-- Reference counting or page flags manipulation
-
-Without proper locking or atomic operations, the kernel can enter an inconsistent state where:
-
-- A page is partially copied while being modified
-- Permissions are not properly enforced during the copy window
-- A privileged buffer is copied with unprivileged access still available
-
-### Attack Vector
-
-An unprivileged attacker can exploit Copy Fail by:
-
-1. Creating a race condition window between operations
-2. Forcing the kernel into the vulnerable code path
-3. Timing writes to coincide with kernel page copies
-4. Achieving kernel memory corruption or unauthorized access
+As a result, protected executable data stored in the page cache can be modified without normal filesystem permission checks.
 
 ---
 
-## Environment & Affected Versions
+# Attack Vector
 
-### Kernel Versions
+**Attack Complexity:** Low
 
-- **Vulnerable:** Kernel versions [4.14 - 6.19.11]
-- **Patched:** Kernel version [6.19.12] and later
-- **Status:** Backports available for LTS branches
+**Privileges Required:** Local, unprivileged user
 
-### Test Environment
+An attacker performs the following steps:
 
-**Setup used for reproduction:**
-- **Hypervisor:** QEMU/KVM 
-- **OS:** Ubuntu [version]
-- **Kernel:** [version with vulnerability]
-- **Architecture:** x86_64
-- **Compiler:** gcc [version], with standard build tools
+1. Create an AF_ALG socket.
+2. Configure a cryptographic request.
+3. Prepare controlled source and destination buffers.
+4. Trigger the vulnerable cryptographic operation.
+5. Cause the kernel to overwrite file-backed page cache pages.
+6. Execute the modified privileged binary.
+7. Obtain root privileges.
+
+---
+
+# Environment & Affected Versions
+
+## Kernel Versions
+
+**Vulnerable:** Linux kernel versions **4.14 - 6.19.11**
+
+**Patched:** Linux kernel **6.19.12** and later
+
+**Status:** Backports available for supported LTS branches
+
+## Test Environment
+
+| Component | Configuration |
+|-----------|---------------|
+| Hypervisor | QEMU/KVM |
+| Operating System | Ubuntu *(replace with your version)* |
+| Kernel | *(replace with the vulnerable kernel version used for testing)* |
+| Architecture | x86_64 |
+| Compiler | GCC *(replace with version)* |
+| Build Tools | gcc, make, binutils, libc development packages |
 
 ---
 
-## Reproduction Steps
+# Reproduction Steps
 
-### Prerequisites
+1. Boot a system running a vulnerable Linux kernel (4.14–6.19.11).
+2. Verify that the AF_ALG Crypto API is available.
+3. Compile the proof-of-concept (PoC) exploit using GCC.
+4. Execute the exploit as an unprivileged user.
+5. The exploit creates an AF_ALG socket and prepares crafted cryptographic requests.
+6. Carefully constructed scatterlists cause the crypto subsystem to treat file-backed page cache pages as writable destination buffers.
+7. The kernel writes attacker-controlled data into the page cache during the cryptographic operation.
+8. Execute the modified privileged binary.
+9. Verify successful privilege escalation.
 
-Ensure you are running a vulnerable kernel version. Verify with:
-
-```bash
-uname -r
-```
-
-### Compiling the PoC
-
-```bash
-# Download or create the PoC source
-gcc -o copy_fail_poc copy_fail_poc.c -pthread
-
-# Compile with debug symbols if available
-gcc -o copy_fail_poc copy_fail_poc.c -pthread -g
-```
-
-### Running the Exploit
-
-```bash
-# Basic execution
-./copy_fail_poc
-
-# With verbose output
-./copy_fail_poc -v
-
-# Run against a specific target (if applicable)
-./copy_fail_poc -t /path/to/target/file
-```
-
-### Expected Behavior (Vulnerable System)
-
-- Before: File has restricted permissions (e.g., `-rw-r----- root:root`)
-- After: File is successfully modified by unprivileged user
-- Evidence: Modified file content, changed timestamps, corrupted data visible
-
-### Actual Behavior (Patched System)
-
-- Modification attempt fails
-- Permissions enforced correctly
-- No data corruption occurs
-
----
+> **Note:** Perform testing only in an isolated virtual machine using a vulnerable kernel version. Do not execute the exploit on production systems.
 
 ## Proof of Concept (PoC) Evidence
 
