@@ -103,131 +103,90 @@ An attacker performs the following steps:
 <img width="723" height="362" alt="merged" src="https://github.com/user-attachments/assets/9c4915c5-57c4-4204-b137-6eaa4008fd9a" />
 
 
+# Technical Breakdown
 
+The vulnerability resides within the Linux kernel's **AF_ALG (Address Family Algorithm)** interface, which provides user-space access to the kernel Crypto API.
 
+During an AF_ALG cryptographic request, the kernel creates two scatter-gather lists:
 
-### Visual Evidence
+- **Source (`req->src`)**: References the input data.
+- **Destination (`req->dst`)**: References the location where the cryptographic output will be written.
 
-- **Screenshot/GIF:** Before and after file state
-- **Terminal output:** PoC execution and success indicators
-- **Kernel logs:** Any relevant dmesg output during exploitation
+These scatterlists describe memory pages instead of requiring contiguous memory, allowing the crypto subsystem to efficiently process large buffers.
 
-[Screenshots/GIFs to be added during testing]
+The vulnerability occurs because destination scatterlists are not sufficiently validated before being used by the crypto subsystem. Through carefully crafted AF_ALG requests, file-backed page cache pages can become writable destinations.
 
----
+The crypto operation subsequently writes directly into these page cache pages. Although the filesystem itself remains unchanged, future executions of the affected executable use the modified page cache contents, resulting in unauthorized code execution.
 
-## Technical Breakdown
-
-### The Race Condition Window
-
-```
-Timeline of vulnerable execution:
-
-[Process A]                          [Process B - Attacker]
------------                          ----------------------
-Read page state
-                                     Initiate copy operation
-                                     Begin racing condition
-Check permissions
-                                     Modify page metadata
-Copy page (with stale perms)
-Write result
-                                     Access sensitive data
-```
-
-### Why Normal Locking Fails
-
-[Insert explanation of why existing lock mechanisms don't prevent this race]
+The exploit relies entirely on legitimate kernel cryptographic operations and does not require bypassing filesystem permissions directly. Instead, it abuses incorrect memory handling inside the kernel.
 
 ---
 
-## Patch & Mitigation
+# Patch and Mitigation
 
-### Kernel Patch
+The vulnerability was fixed by strengthening validation of destination scatterlists within the Linux Crypto API.
 
-**Commit:** [upstream commit hash]  
-**Author:** [developer name]  
-**Date:** [patch date]
+The patch ensures that:
 
-**Key changes:**
-1. Add atomic operations to [specific code section]
-2. Increase synchronization granularity
-3. Validate page state before copy completion
+- File-backed page cache pages cannot be used as writable crypto destinations.
+- Scatterlist entries are properly validated before write operations.
+- Invalid memory mappings are rejected before the cryptographic request is processed.
+- Kernel write protections are enforced throughout the AF_ALG request lifecycle.
 
-### Example Patch
+## Mitigation
 
-```c
-// BEFORE (vulnerable)
-void copy_page_vulnerable(struct page *src, struct page *dst) {
-    void *src_addr = kmap_atomic(src);
-    void *dst_addr = kmap_atomic(dst);
-    memcpy(dst_addr, src_addr, PAGE_SIZE);
-    kunmap_atomic(dst_addr);
-    kunmap_atomic(src_addr);
-}
+Systems can be protected by:
 
-// AFTER (patched)
-void copy_page_fixed(struct page *src, struct page *dst) {
-    spin_lock(&page_lock);
-    validate_page_state(src, dst);
-    
-    void *src_addr = kmap_atomic(src);
-    void *dst_addr = kmap_atomic(dst);
-    memcpy(dst_addr, src_addr, PAGE_SIZE);
-    kunmap_atomic(dst_addr);
-    kunmap_atomic(src_addr);
-    
-    spin_unlock(&page_lock);
-}
-```
-
-### Backports
-
-- **Linux 5.15 LTS:** Available in [commit/tag]
-- **Linux 5.4 LTS:** Available in [commit/tag]
-- **Ubuntu 22.04 LTS:** Included in kernel [version]
-
-### Workarounds
-
-Until patching is possible:
-- Run only trusted code
-- Restrict use of [vulnerable syscall/feature]
-- Monitor kernel logs for suspicious activity
+- Upgrading to **Linux kernel 6.19.12 or later**.
+- Applying vendor-provided backports for supported LTS kernels.
+- Restricting access to AF_ALG interfaces where practical.
+- Keeping systems updated with the latest security patches.
 
 ---
 
-## Impact Assessment
+# Impact Assessment
 
-### Security Implications
+| Metric | Assessment |
+|--------|------------|
+| Vulnerability Type | Local Privilege Escalation |
+| Attack Complexity | Low |
+| Privileges Required | Local User |
+| User Interaction | None |
+| Scope | Local System |
+| Impact | Root privilege escalation |
+| Affected Component | Linux AF_ALG Crypto API |
+| Exploitability | High on vulnerable kernels |
 
-- **Confidentiality:** Sensitive kernel memory could be leaked
-- **Integrity:** Kernel structures and file contents could be corrupted
-- **Availability:** System crash or denial of service possible
-
-### Real-World Scenarios
-
-- Privilege escalation to root
-- Bypass of security module restrictions (SELinux, AppArmor)
-- Theft of cryptographic keys from kernel memory
-
----
-
-## References
-
-- [NVD CVE Entry](https://nvd.nist.gov/vuln/detail/CVE-2026-31431)
-- Upstream Linux kernel commit: [link]
-- LWN.net coverage: [link if available]
-- Ubuntu Security Notices: [link]
+Successful exploitation allows an unprivileged local user to execute arbitrary code with root privileges by modifying privileged executables through the kernel page cache.
 
 ---
 
-## Notes & Learnings
+# References
 
-- [Add learnings from reproduction process]
-- [Challenges encountered during PoC development]
-- [Differences from similar vulnerabilities (Dirty COW, DirtyPipe, etc.)]
+- Linux Kernel Security Advisory for **CVE-2026-31431**
+- Linux Kernel Git Repository (Patch Commit)
+- Linux Kernel Crypto API Documentation
+- Linux AF_ALG Documentation
+- Common Vulnerabilities and Exposures (CVE) Database
+- National Vulnerability Database (NVD)
+- Relevant Linux distribution security advisories (Ubuntu, Debian, Fedora, Red Hat, SUSE)
 
 ---
 
-*Last Updated: [Date]*  
-*Status: [Proof of Concept Pending / In Progress / Complete]*
+# Notes and Learnings
+
+During the analysis of CVE-2026-31431, several important Linux kernel concepts became essential for understanding the vulnerability:
+
+- The AF_ALG socket interface allows user-space applications to access the Linux Crypto API.
+- Scatter-gather (`scatterlist`) structures describe memory as a collection of pages rather than a single contiguous buffer.
+- Source (`req->src`) and destination (`req->dst`) scatterlists determine where cryptographic operations read and write data.
+- The Linux page cache stores cached file contents in RAM to improve filesystem performance.
+- Writing to page cache pages differs from writing directly to files on disk.
+- Improper validation of destination scatterlists can unintentionally expose protected page cache pages to kernel write operations.
+- The vulnerability demonstrates how memory management mistakes can bypass traditional filesystem permission checks.
+- Studying this vulnerability provides insight into Linux kernel memory management, scatterlists, page cache behavior, AF_ALG sockets, and secure validation of kernel data structures.
+
+This project highlights the importance of validating kernel memory references before performing write operations, especially when user-controlled inputs interact with privileged kernel subsystems.
+
+
+f Concept Pending / In Progress / Complete]*
