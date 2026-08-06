@@ -9,7 +9,7 @@
 | **CVSS Score** | 7.0 (High) |
 | **Severity** | High |
 | **Affected Component** | Linux kernel page cache and fragmentation handling |
-| **CWE** | CWE-362 — Concurrent Execution using Shared Resource with Improper Synchronization |
+| **CWE** | CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization |
 
 ---
 
