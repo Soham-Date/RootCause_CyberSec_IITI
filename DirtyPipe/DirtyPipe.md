@@ -11,7 +11,7 @@
 | **Affected Component** | Linux kernel pipe buffer flag handling |
 | **Affected Versions** | Kernel 5.8 – 5.16.10 / 5.15.24 / 5.10.101 |
 | **Patched Versions** | 5.16.11 / 5.15.25 / 5.10.102 |
-| **CWE** | CWE-909 — Missing Initialization of Resource |
+| **CWE** | CWE-909: Missing Initialization of Resource |
 
 ---
 
